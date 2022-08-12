@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+        - 5672:5672
+        - 15672:15672
+    networks:
+      - pingnet
+
+  pinger:
+    depends_on: 
+      - rabbitmq
+    build:
+      context: .
+    environment: 
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672
+      MESSAGE_PREFIX: ping
+    networks:
+      - pingnet
+  
+  ponger:
+    depends_on: 
+      - rabbitmq
+    build:
+      context: .
+    environment: 
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672
+      MESSAGE_PREFIX: pong
+    networks:
+      - pingnet
+
+networks:
+  pingnet:
